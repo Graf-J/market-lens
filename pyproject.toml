@@ -1,6 +1,8 @@
 [project]
 name = "market-lens"
 version = "0.1.0"
+description = "End-to-end stock market pipeline: yfinance -> Snowflake -> dbt -> Airflow -> Streamlit"
+readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "dbt-core>=1.12.7",
