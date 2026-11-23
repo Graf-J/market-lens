@@ -1,0 +1,28 @@
+# --- Python / uv ---
+__pycache__/
+*.py[oc]
+.venv/
+*.egg-info/
+
+# --- Secrets (NEVER commit) ---
+.env
+**/.env
+*.p8
+*.pem
+**/.streamlit/secrets.toml
+airflow/airflow_settings.yaml
+
+# --- dbt artifacts ---
+**/target/
+**/dbt_packages/
+**/logs/
+**/.user.yml
+
+# --- Course material (not part of the public repo) ---
+MLDS_430_DW_Project.pdf
+
+# --- OS / editor ---
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
