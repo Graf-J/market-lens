@@ -1,0 +1,14 @@
+ticker,company_name,sector,is_benchmark
+AAPL,Apple Inc.,Information Technology,false
+MSFT,Microsoft Corporation,Information Technology,false
+NVDA,NVIDIA Corporation,Information Technology,false
+GOOGL,Alphabet Inc. (Class A),Communication Services,false
+META,Meta Platforms Inc.,Communication Services,false
+AMZN,Amazon.com Inc.,Consumer Discretionary,false
+TSLA,Tesla Inc.,Consumer Discretionary,false
+KO,The Coca-Cola Company,Consumer Staples,false
+JPM,JPMorgan Chase & Co.,Financials,false
+V,Visa Inc.,Financials,false
+JNJ,Johnson & Johnson,Health Care,false
+XOM,Exxon Mobil Corporation,Energy,false
+SPY,SPDR S&P 500 ETF Trust,Benchmark,true
