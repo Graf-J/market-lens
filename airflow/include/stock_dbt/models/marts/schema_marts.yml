@@ -1,0 +1,109 @@
+models:
+  - name: dim_tickers
+    description: One row per tracked ticker with descriptive attributes and price-history coverage.
+    columns:
+      - name: ticker
+        description: Ticker symbol (primary key).
+        data_tests: [unique, not_null]
+      - name: company_name
+        description: Company / fund name.
+        data_tests: [not_null]
+      - name: sector
+        description: GICS sector; 'Benchmark' for SPY.
+        data_tests: [not_null]
+      - name: is_benchmark
+        description: True for the market benchmark (SPY).
+        data_tests: [not_null]
+      - name: first_price_date
+        description: First trading day with price data.
+      - name: last_price_date
+        description: Most recent trading day with price data.
+      - name: trading_days
+        description: Number of trading days with price data.
+
+  - name: fct_daily_returns
+    description: >
+      One row per ticker and trading day with the daily return and the drawdown
+      from the running all-time peak. Feeds the normalized performance and
+      drawdown charts.
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns: [ticker, price_date]
+    columns:
+      - name: ticker
+        description: Ticker symbol.
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_tickers')
+                field: ticker
+      - name: price_date
+        description: Trading day.
+        data_tests: [not_null]
+      - name: adj_close
+        description: Split- and dividend-adjusted close.
+        data_tests: [not_null]
+      - name: close_price
+        description: Unadjusted close (the price actually traded that day).
+      - name: volume
+        description: Number of shares traded.
+      - name: daily_return
+        description: adj_close / previous day's adj_close - 1. Null on a ticker's first day.
+      - name: running_peak
+        description: Highest adj_close up to and including this day.
+        data_tests: [not_null]
+      - name: drawdown
+        description: adj_close / running_peak - 1. Always <= 0; 0 means a new high.
+        data_tests: [not_null]
+
+  - name: mart_stock_performance
+    description: >
+      One row per ticker and look-back period (1M, 3M, 6M, YTD, 1Y, 3Y, 5Y) with
+      total return, annualized volatility and maximum drawdown. Periods are
+      anchored on the latest trading day in the data. Feeds the KPI table and
+      the risk-vs-return scatter plot.
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns: [ticker, period]
+    columns:
+      - name: ticker
+        description: Ticker symbol.
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_tickers')
+                field: ticker
+      - name: period
+        description: Look-back period label.
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['1M', '3M', '6M', 'YTD', '1Y', '3Y', '5Y']
+      - name: period_order
+        description: Sort key for periods (1 = 1M ... 7 = 5Y).
+      - name: start_date
+        description: First trading day in the period.
+        data_tests: [not_null]
+      - name: end_date
+        description: Last trading day in the period (latest data).
+        data_tests: [not_null]
+      - name: trading_days
+        description: Number of trading days in the period.
+      - name: start_price
+        description: Adjusted close on start_date.
+      - name: end_price
+        description: Adjusted close on end_date.
+      - name: total_return
+        description: end_price / start_price - 1 (includes dividends via adjusted prices).
+        data_tests: [not_null]
+      - name: annualized_volatility
+        description: Sample standard deviation of daily returns within the period x sqrt(252).
+        data_tests: [not_null]
+      - name: max_drawdown
+        description: Largest peak-to-trough decline within the period (running peak restarts at the period start). In [-1, 0].
+        data_tests: [not_null]

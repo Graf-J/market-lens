@@ -1,0 +1,30 @@
+sources:
+  - name: raw
+    description: Raw landing zone, written by the Python/Airflow ingestion (MERGE upsert).
+    database: STOCKS_DB
+    schema: RAW
+    tables:
+      - name: stock_prices_daily
+        identifier: STOCK_PRICES_DAILY
+        description: Daily OHLCV prices from Yahoo Finance, one row per ticker and trading day.
+        config:
+          loaded_at_field: LOADED_AT
+          # Pipeline runs every weekday; 3 days tolerates a weekend.
+          freshness:
+            warn_after: {count: 3, period: day}
+            error_after: {count: 5, period: day}
+        data_tests:
+          - dbt_utils.unique_combination_of_columns:
+              arguments:
+                combination_of_columns: [TICKER, PRICE_DATE]
+        columns:
+          - name: TICKER
+            description: Ticker symbol.
+            data_tests: [not_null]
+          - name: PRICE_DATE
+            description: Trading day.
+            data_tests: [not_null]
+          - name: ADJ_CLOSE
+            description: Split- and dividend-adjusted close.
+          - name: LOADED_AT
+            description: UTC timestamp of the load that last wrote the row.

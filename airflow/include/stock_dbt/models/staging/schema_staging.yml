@@ -1,0 +1,37 @@
+models:
+  - name: stg_stock_prices
+    description: >
+      Cleaned and typed copy of RAW.STOCK_PRICES_DAILY. Removes rows without a
+      valid adjusted close and renames OHLC columns to avoid reserved words.
+      Grain: one row per ticker and trading day.
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns: [ticker, price_date]
+    columns:
+      - name: ticker
+        description: Ticker symbol (upper case).
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('tickers')
+                field: ticker
+      - name: price_date
+        description: Trading day.
+        data_tests: [not_null]
+      - name: open_price
+        description: Opening price (unadjusted).
+      - name: high_price
+        description: Intraday high (unadjusted).
+      - name: low_price
+        description: Intraday low (unadjusted).
+      - name: close_price
+        description: Closing price (unadjusted).
+      - name: adj_close
+        description: Close adjusted for splits and dividends; basis for all return calculations.
+        data_tests: [not_null]
+      - name: volume
+        description: Number of shares traded.
+      - name: loaded_at
+        description: UTC timestamp of the load that last wrote the row.

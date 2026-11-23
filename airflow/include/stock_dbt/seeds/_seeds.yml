@@ -1,0 +1,21 @@
+seeds:
+  - name: tickers
+    description: >
+      The tracked stock universe. Single source of truth: the ingestion step
+      downloads exactly these tickers, and dim_tickers is built from it.
+    config:
+      column_types:
+        ticker: varchar(10)
+        company_name: varchar(100)
+        sector: varchar(50)
+        is_benchmark: boolean
+    columns:
+      - name: ticker
+        description: Ticker symbol, e.g. AAPL.
+        data_tests: [unique, not_null]
+      - name: company_name
+        description: Company / fund name.
+      - name: sector
+        description: GICS sector (SPY is labelled 'Benchmark').
+      - name: is_benchmark
+        description: True for the market benchmark (SPY) that stocks are compared against.

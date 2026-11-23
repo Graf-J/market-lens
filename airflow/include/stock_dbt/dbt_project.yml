@@ -1,0 +1,25 @@
+name: stock_dbt
+version: "1.0.0"
+profile: stock_dbt
+
+model-paths: ["models"]
+seed-paths: ["seeds"]
+test-paths: ["tests"]
+macro-paths: ["macros"]
+
+clean-targets: ["target", "dbt_packages"]
+
+# Schemas are used *exactly* as named here (see macros/generate_schema_name.sql):
+#   STAGING -> cleaned views + seeds, MARTS -> tables for the dashboard
+models:
+  stock_dbt:
+    staging:
+      +schema: STAGING
+      +materialized: view
+    marts:
+      +schema: MARTS
+      +materialized: table
+
+seeds:
+  stock_dbt:
+    +schema: STAGING
